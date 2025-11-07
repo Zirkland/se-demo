@@ -2,10 +2,13 @@ package com.harvey.se.util;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.harvey.se.pojo.vo.DateRange;
 import com.harvey.se.properties.ConstantsProperties;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.util.Date;
 
 /**
  * 依据常量的初始化工具
@@ -28,4 +31,22 @@ public class ConstantsInitializer {
         }
         return new Page<>(page, limit);
     }
+
+
+    public static DateRange initDateRange(String startDateString, String endDateString) throws ParseException {
+        return new DateRange(initDate(startDateString), initDate(endDateString));
+    }
+
+    public static Date initDate(String dateString) throws ParseException {
+        if (dateString == null || dateString.isEmpty()) {
+            return null;
+        } else {
+            return ServerConstants.DATE_TIME_FORMAT.parse(dateString);
+        }
+    }
+
+    public static Date nowDateTime() {
+        return new Date(System.currentTimeMillis());
+    }
+
 }

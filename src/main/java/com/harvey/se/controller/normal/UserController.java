@@ -11,6 +11,7 @@ import com.harvey.se.pojo.vo.Result;
 import com.harvey.se.properties.ConstantsProperties;
 import com.harvey.se.service.UserService;
 import com.harvey.se.util.RedisConstants;
+import com.harvey.se.util.ServerConstants;
 import com.harvey.se.util.UserHolder;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +77,7 @@ public class UserController {
      */
     @PostMapping("/login")
     @ApiOperation("登录")
-    @ApiResponse(code = 200, responseHeaders = @ResponseHeader(name = ConstantsProperties.AUTHORIZATION_HEADER,
+    @ApiResponse(code = 200, responseHeaders = @ResponseHeader(name = ServerConstants.AUTHORIZATION_HEADER,
             description = "JWT token"),
             message = "在响应头里有用户校验token, 发送请求时在请求头里带上这个token, 表示这个用户已经登录")
     public Result<Null> login(
@@ -99,7 +100,7 @@ public class UserController {
      */
     @PostMapping("/register")
     @ApiOperation("注册")
-    @ApiResponse(code = 200, responseHeaders = @ResponseHeader(name = ConstantsProperties.AUTHORIZATION_HEADER,
+    @ApiResponse(code = 200, responseHeaders = @ResponseHeader(name = ServerConstants.AUTHORIZATION_HEADER,
             description = "JWT token"),
             message = "在响应头里有用户校验token, 发送请求时在请求头里带上这个token, 表示这个用户已经登录")
     public Result<Null> register(

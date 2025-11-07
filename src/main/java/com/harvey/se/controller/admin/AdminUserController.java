@@ -10,6 +10,7 @@ import com.harvey.se.properties.ConstantsProperties;
 import com.harvey.se.service.UserService;
 import com.harvey.se.util.ConstantsInitializer;
 import com.harvey.se.util.RedisConstants;
+import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -78,7 +79,7 @@ public class AdminUserController {
             @PathVariable(value = "limit", required = false) @ApiParam(value = "页号,从1开始", defaultValue = "1")
             Integer limit,
             @PathVariable(value = "page", required = false)
-            @ApiParam(value = "页长", defaultValue = ConstantsProperties.DEFAULT_PAGE_SIZE) Integer page) {
+            @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer page) {
         List<UserEntityDto> userEntityDto = userService.queryUserEntityByPage(constantsInitializer.initPage(
                 page,
                 limit

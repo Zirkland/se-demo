@@ -1,7 +1,7 @@
 package com.harvey.se.interceptor;
 
 import com.harvey.se.pojo.enums.UserRole;
-import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.util.ServerConstants;
 import com.harvey.se.util.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -30,7 +30,7 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
             response.setStatus(401);
             return false;
         }
-        if (ConstantsProperties.ROOT_AUTH_URI.contains(request.getRequestURI())) {
+        if (ServerConstants.ROOT_AUTH_URI.contains(request.getRequestURI())) {
             if (roleValue != UserRole.ROOT.getValue()) {
                 log.info("root coming");
                 response.setStatus(401);

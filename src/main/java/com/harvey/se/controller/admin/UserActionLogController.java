@@ -4,6 +4,7 @@ import com.harvey.se.exception.UncompletedException;
 import com.harvey.se.pojo.dto.UserActionLogDto;
 import com.harvey.se.pojo.vo.Result;
 import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,7 +39,7 @@ public class UserActionLogController {
             @PathVariable(value = "longer-than")
             @ApiParam(value = "长度大于此毫秒数(包括)的, 将被返回", required = true) Integer longerThan,
             @PathVariable(value = "limit", required = false)
-            @ApiParam(value = "页长", defaultValue = ConstantsProperties.DEFAULT_PAGE_SIZE) Integer limit,
+            @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer limit,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 在服务器消费耗费长的操作
@@ -52,12 +53,12 @@ public class UserActionLogController {
     @ApiResponse(code = 200, message = "按照时间排序, 返回的时间顺序和参数的from-to一致")
     public Result<List<UserActionLogDto>> getLatestActionByRequestTimeRange(
             @PathVariable(value = "time-from", required = false)
-            @ApiParam(value = "日期查询的起点(包含)", example = ConstantsProperties.AUTHORIZATION_HEADER)
+            @ApiParam(value = "日期查询的起点(包含)", example = ServerConstants.AUTHORIZATION_HEADER)
             String timeFrom,
             @PathVariable(value = "time-to", required = false)
-            @ApiParam(value = "日期查询的终点(包含)", example = ConstantsProperties.AUTHORIZATION_HEADER) String timeTo,
+            @ApiParam(value = "日期查询的终点(包含)", example = ServerConstants.AUTHORIZATION_HEADER) String timeTo,
             @PathVariable(value = "limit", required = false)
-            @ApiParam(value = "页长", defaultValue = ConstantsProperties.DEFAULT_PAGE_SIZE) Integer limit,
+            @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer limit,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 依据请求发送的时间查询, 从新到旧排序

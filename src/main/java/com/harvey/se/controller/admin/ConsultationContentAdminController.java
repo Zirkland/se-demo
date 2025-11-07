@@ -6,6 +6,7 @@ import com.harvey.se.pojo.dto.ConsultationContentWithUserEntityDto;
 import com.harvey.se.pojo.dto.HotWordDto;
 import com.harvey.se.pojo.vo.Result;
 import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -51,7 +52,7 @@ public class ConsultationContentAdminController {
     @ApiOperation(value = "分页查询用户咨询")
     public Result<List<ConsultationContentDto>> consultation(
             @PathVariable(value = "limit", required = false)
-            @ApiParam(value = "页长", defaultValue = ConstantsProperties.DEFAULT_PAGE_SIZE) Integer limit,
+            @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer limit,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 不提供就使用默认值
@@ -73,7 +74,7 @@ public class ConsultationContentAdminController {
     @ApiResponse(message = "包含用户信息和咨询信息", code = 200)
     public Result<List<ConsultationContentWithUserEntityDto>> bothByPage(
             @PathVariable(value = "limit", required = false)
-            @ApiParam(value = "页长", defaultValue = ConstantsProperties.DEFAULT_PAGE_SIZE) Integer limit,
+            @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer limit,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 不提供就使用默认值

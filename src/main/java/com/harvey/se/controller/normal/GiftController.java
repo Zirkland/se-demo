@@ -6,6 +6,7 @@ import com.harvey.se.pojo.dto.GiftInfoDto;
 import com.harvey.se.pojo.vo.Null;
 import com.harvey.se.pojo.vo.Result;
 import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,7 +35,7 @@ public class GiftController {
     @ApiResponse(code = 200, message = "按照id升序")
     public Result<List<GiftDto>> queryAll(
             @PathVariable(value = "limit", required = false)
-            @ApiParam(value = "页长", defaultValue = ConstantsProperties.DEFAULT_PAGE_SIZE) Integer limit,
+            @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer limit,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 不提供就使用默认值
@@ -50,7 +51,7 @@ public class GiftController {
             @PathVariable(value = "upper", required = false)
             @ApiParam(value = "商品花费积分上限(包含)", defaultValue = "null, 表示无限") Integer upper,
             @PathVariable(value = "limit", required = false)
-            @ApiParam(value = "页长", defaultValue = ConstantsProperties.DEFAULT_PAGE_SIZE) Integer limit,
+            @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer limit,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 按照花销排序, 使用升序排序

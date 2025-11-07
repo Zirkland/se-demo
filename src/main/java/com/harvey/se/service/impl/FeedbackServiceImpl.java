@@ -1,10 +1,18 @@
 package com.harvey.se.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.harvey.se.dao.FeedbackMapper;
+import com.harvey.se.pojo.dto.FeedbackDto;
 import com.harvey.se.pojo.entity.Feedback;
+import com.harvey.se.pojo.vo.DateRange;
 import com.harvey.se.service.FeedbackService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -18,4 +26,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> implements FeedbackService {
 
+    @Override
+    public List<FeedbackDto> queryFeedback(DateRange dateRange, Page<Feedback> page, boolean read) {
+        LambdaQueryChainWrapper<Feedback> wrapper = new LambdaQueryChainWrapper<>(this.baseMapper).eq(
+                Feedback::getRead,
+                read
+        );
+        if (dateRange.isForward()) {
+            wrapper.ge(dateRange.getFrom() != null, Feedback::getCreateTime, dateRange.getFrom())
+                    .le(dateRange.getTo() != null, Feedback::getCreateTime, dateRange.getTo())
+                    .orderByAsc(Feedback::getCreateTime, (SFunction<Feedback, ?>[]) null);
+            ;
+        } else {
+            wrapper.ge(dateRange.getTo() != null, Feedback::getCreateTime, dateRange.getTo())
+                    .le(dateRange.getFrom() != null, Feedback::getCreateTime, dateRange.getFrom())
+                    .orderByDesc(Feedback::getCreateTime, (SFunction<Feedback, ?>[]) null);
+        }
+        return wrapper.page(page).getRecords().stream().map(FeedbackDto::new).collect(Collectors.toList());
+    }
 }

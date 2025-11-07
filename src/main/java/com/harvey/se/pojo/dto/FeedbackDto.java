@@ -1,7 +1,7 @@
 package com.harvey.se.pojo.dto;
 
 import com.harvey.se.pojo.entity.Feedback;
-import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ public class FeedbackDto {
     @ApiModelProperty(value = "文本", required = true)
     private String text;
 
-    @ApiModelProperty(value = "请求日期, 系统自己决定", example = ConstantsProperties.DATE_TIME_FORMAT)
+    @ApiModelProperty(value = "请求日期, 系统自己决定", example = ServerConstants.DATE_TIME_FORMAT_STRING)
     private Date createTime;
 
     @ApiModelProperty(value = "是否已读")

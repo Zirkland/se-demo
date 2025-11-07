@@ -22,4 +22,20 @@ public class DateRange implements Serializable {
      * null for 不设限制
      */
     private final Date to;
+    /**
+     * true if {@link #to} is future
+     */
+    private final boolean forward;
+
+    public DateRange(Date from, Date to) {
+        if (from != null && to != null && from.after(to)) {
+            this.from = to;
+            this.to = from;
+            this.forward = false;
+        } else {
+            this.from = from;
+            this.to = to;
+            this.forward = true;
+        }
+    }
 }

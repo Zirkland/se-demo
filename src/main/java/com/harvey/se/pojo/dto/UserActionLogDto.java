@@ -1,7 +1,7 @@
 package com.harvey.se.pojo.dto;
 
 import com.harvey.se.pojo.entity.UserActionLog;
-import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -39,7 +39,7 @@ public class UserActionLogDto {
     @ApiModelProperty("请求的发送方法, 也就是Put, Post, Get, Delete")
     private String requestMethod;
 
-    @ApiModelProperty(value = "发起请求的时间", example = ConstantsProperties.DATE_TIME_FORMAT)
+    @ApiModelProperty(value = "发起请求的时间", example = ServerConstants.DATE_TIME_FORMAT_STRING)
     private Date requestTime;
 
     @ApiModelProperty(value = "响应时间损耗, 单位ms")
