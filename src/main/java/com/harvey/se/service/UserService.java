@@ -68,4 +68,6 @@ public interface UserService extends IService<User> {
     List<UserEntityDto> queryUserEntityByPage(Page<User> page);
 
     void updateUserEntity(UserEntityDto newUser);
+
+    List<User> queryUserByPage(Page<User> objectPage);
 }

@@ -1,11 +1,16 @@
 package com.harvey.se.controller.admin;
 
-import com.harvey.se.exception.UncompletedException;
 import com.harvey.se.pojo.dto.ConsultationContentDto;
 import com.harvey.se.pojo.dto.ConsultationContentWithUserEntityDto;
 import com.harvey.se.pojo.dto.HotWordDto;
+import com.harvey.se.pojo.dto.UserEntityDto;
+import com.harvey.se.pojo.entity.User;
 import com.harvey.se.pojo.vo.Result;
 import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.service.ConsultationContentService;
+import com.harvey.se.service.HotWordService;
+import com.harvey.se.service.UserService;
+import com.harvey.se.util.ConstantsInitializer;
 import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -33,19 +39,29 @@ import java.util.List;
 @RequestMapping("/admin/consultation/")
 @EnableConfigurationProperties(ConstantsProperties.class)
 public class ConsultationContentAdminController {
+    @Resource
+    private ConsultationContentService consultationContentService;
+    @Resource
+    private HotWordService hotWordService;
+
+    @Resource
+    private UserService userService;
+    @Resource
+    private ConstantsInitializer constantsInitializer;
+
 
     @GetMapping(value = "/hot-word/{limit}")
     @ApiOperation(value = "查询排名前limit位的热词")
     public Result<List<HotWordDto>> topHotWord(
             @PathVariable(value = "limit") @ApiParam(value = "排名", required = true) Integer limit) {
-        throw new UncompletedException("查询热词");
+        return new Result<>(hotWordService.top(limit));
     }
 
     @GetMapping(value = "/user/{user-id}")
     @ApiOperation(value = "依据UserId查询某位User的购车咨询")
-    public Result<List<ConsultationContentDto>> consultationByUser(
+    public Result<ConsultationContentDto> consultationByUser(
             @PathVariable("user-id") @ApiParam(value = "UserId", required = true) Long userId) {
-        throw new UncompletedException("依据用户查询购车咨询");
+        return new Result<>(consultationContentService.queryByUser(userId));
     }
 
     @GetMapping(value = "/all/{limit}/{page}")
@@ -56,7 +72,7 @@ public class ConsultationContentAdminController {
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 不提供就使用默认值
-        throw new UncompletedException("分页查询购车咨询");
+        return new Result<>(consultationContentService.queryByPage(constantsInitializer.initPage(page, limit)));
     }
 
 
@@ -65,7 +81,9 @@ public class ConsultationContentAdminController {
     public Result<ConsultationContentWithUserEntityDto> bothById(
             @PathVariable(value = "id") @ApiParam("用户id") Long userId) {
         // 不提供就使用默认值
-        throw new UncompletedException("依据用户id查询购车咨询+用户信息");
+        ConsultationContentDto consultationContentDto = consultationContentService.queryByUser(userId);
+        UserEntityDto userEntityDto = userService.queryUserEntityById(userId);
+        return new Result<>(ConsultationContentWithUserEntityDto.instance(consultationContentDto, userEntityDto));
     }
 
 
@@ -78,6 +96,7 @@ public class ConsultationContentAdminController {
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 不提供就使用默认值
-        throw new UncompletedException("分页查询购车咨询+用户信息");
+        List<User> userList = userService.queryUserByPage(constantsInitializer.initPage(page, limit));
+        return new Result<>(consultationContentService.combineWithUsers(userList));
     }
 }

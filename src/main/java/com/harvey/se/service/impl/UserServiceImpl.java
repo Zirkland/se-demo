@@ -221,8 +221,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // ignore update of points
         // 更新
         String tokenKey = RedisConstants.User.TOKEN_CACHE_KEY + jwtTool.parseToken(token);
-        String lastTime = Optional.ofNullable(
-                        (String) stringRedisTemplate.opsForHash().get(tokenKey, RedisConstants.User.REQUEST_TIME_FIELD))
+        String lastTime = Optional.ofNullable((String) stringRedisTemplate.opsForHash()
+                        .get(tokenKey, RedisConstants.User.REQUEST_TIME_FIELD))
                 .orElseGet(() -> constantsProperties.getRestrictRequestTimes());
         stringRedisTemplate.delete(tokenKey);
         // 更新数据库
@@ -279,11 +279,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private Map<String, String> user2Map(UserDto user) {
         return Map.of(
-                RedisConstants.User.ID_FIELD, user.getId().toString(),
-                RedisConstants.User.NICKNAME_FIELD, user.getNickname(),
-                RedisConstants.User.POINTS_FIELD, user.getPoints().toString(),
-                RedisConstants.User.ROLE_FIELD, user.getRole().toString(),
-                RedisConstants.User.REQUEST_TIME_FIELD, constantsProperties.getRestrictRequestTimes()
+                RedisConstants.User.ID_FIELD,
+                user.getId().toString(),
+                RedisConstants.User.NICKNAME_FIELD,
+                user.getNickname(),
+                RedisConstants.User.POINTS_FIELD,
+                user.getPoints().toString(),
+                RedisConstants.User.ROLE_FIELD,
+                user.getRole().toString(),
+                RedisConstants.User.REQUEST_TIME_FIELD,
+                constantsProperties.getRestrictRequestTimes()
         );
     }
 
@@ -359,12 +364,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public List<UserEntityDto> queryUserEntityByPage(Page<User> page) {
-        return super.lambdaQuery()
-                .page(page)
-                .getRecords()
-                .stream()
-                .map(UserEntityDto::new)
-                .collect(Collectors.toList());
+        return queryUserByPage(page).stream().map(UserEntityDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -373,6 +373,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             // 不是合法的电话号码
             newUser.setPhone(null);
         }
+        // 啥都可以更新
         boolean update = super.updateById(new User(newUser));
         if (update) {
             log.debug("更新{}成功", newUser.getId());
@@ -380,4 +381,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.warn("更新{}失败", newUser.getId());
         }
     }
+
+    @Override
+    public List<User> queryUserByPage(Page<User> page) {
+        return super.lambdaQuery().page(page).getRecords();
+    }
+
 }

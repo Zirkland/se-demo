@@ -9,8 +9,10 @@ import com.harvey.se.util.RedisConstants;
 import com.harvey.se.util.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -26,19 +28,15 @@ import static com.harvey.se.util.RedisConstants.User.REQUEST_TIME_FIELD;
  * @date 2024-01-03 13:32
  */
 @Slf4j
+@Component
 public class ExpireInterceptor implements HandlerInterceptor {
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private JwtTool jwtTool;
+    @Resource
+    private ConstantsProperties constantsProperties;
 
-    private final StringRedisTemplate stringRedisTemplate;
-    private final JwtTool jwtTool;
-    private final ConstantsProperties constantsProperties;
-
-    public ExpireInterceptor(
-            StringRedisTemplate stringRedisTemplate, JwtTool jwtTool,
-            ConstantsProperties constantsProperties) {
-        this.stringRedisTemplate = stringRedisTemplate;
-        this.jwtTool = jwtTool;
-        this.constantsProperties = constantsProperties;
-    }
 
     @Override
     public boolean preHandle(

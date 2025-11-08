@@ -25,6 +25,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ConsultationContent {
+    public static final ConsultationContent DEFAULT = new ConsultationContent(ConsultationContentDto.DEFAULT);
     @TableField("user_id")
     @TableId(type = IdType.INPUT)
     private Long userId;

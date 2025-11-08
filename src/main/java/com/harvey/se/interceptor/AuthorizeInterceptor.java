@@ -4,6 +4,7 @@ import com.harvey.se.pojo.enums.UserRole;
 import com.harvey.se.util.ServerConstants;
 import com.harvey.se.util.UserHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * @date 2024-02-02 11:21
  */
 @Slf4j
+@Component
 public class AuthorizeInterceptor implements HandlerInterceptor {
 
     @Override
@@ -24,7 +26,7 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
             HttpServletRequest request,
             HttpServletResponse response,
             Object handler) {
-        int roleValue = UserHolder.getUser().getRole().intValue();
+        int roleValue = UserHolder.getUser().getRole();
         if (roleValue == UserRole.BLOCKED.getValue()) {
             // 被拉入黑名单的, 直接无权访问
             response.setStatus(401);

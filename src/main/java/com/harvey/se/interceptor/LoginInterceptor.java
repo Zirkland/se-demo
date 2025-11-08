@@ -1,8 +1,11 @@
 package com.harvey.se.interceptor;
 
+import com.harvey.se.service.UserActionLogService;
 import com.harvey.se.util.UserHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,7 +16,10 @@ import javax.servlet.http.HttpServletResponse;
  * @version 1.0
  * @date 2024-01-03 13:32
  */
+@Component
 public class LoginInterceptor implements HandlerInterceptor {
+    @Resource
+    private UserActionLogService userActionLogService;
 
     @Override
     public boolean preHandle(

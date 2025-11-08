@@ -2,13 +2,11 @@ package com.harvey.se.config;
 
 import com.harvey.se.interceptor.AuthorizeInterceptor;
 import com.harvey.se.interceptor.ExpireInterceptor;
+import com.harvey.se.interceptor.Log2DbInterceptor;
 import com.harvey.se.interceptor.LoginInterceptor;
 import com.harvey.se.properties.AuthProperties;
-import com.harvey.se.properties.ConstantsProperties;
-import com.harvey.se.util.JwtTool;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -29,19 +27,20 @@ public class MvcConfig implements WebMvcConfigurer {
     @Resource
     private AuthProperties authProperties;
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private ExpireInterceptor expireInterceptor;
     @Resource
-    private JwtTool jwtTool;
+    private LoginInterceptor loginInterceptor;
+    @Resource
+    private AuthorizeInterceptor authorizeInterceptor;
 
     @Resource
-    private ConstantsProperties constantsProperties;
+    private Log2DbInterceptor log2DbInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        registry.addInterceptor(
-                new ExpireInterceptor(stringRedisTemplate, jwtTool, constantsProperties));
-
+        registry.addInterceptor(expireInterceptor);
+        registry.addInterceptor(log2DbInterceptor);
 
         List<String> excludePaths = authProperties.getExcludePaths();
         if (excludePaths == null) {
@@ -52,11 +51,9 @@ public class MvcConfig implements WebMvcConfigurer {
             includePaths = Collections.emptyList();
         }
 
-        registry.addInterceptor(new LoginInterceptor())
-                .addPathPatterns(includePaths);
+        registry.addInterceptor(loginInterceptor).addPathPatterns(includePaths);
 
-        registry.addInterceptor(new AuthorizeInterceptor())
-                .addPathPatterns(includePaths);
+        registry.addInterceptor(authorizeInterceptor).addPathPatterns(includePaths);
     }
 
 
