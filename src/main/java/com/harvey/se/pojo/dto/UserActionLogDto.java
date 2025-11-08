@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.sql.Date;
 
 /**
- * TODO
+ * 用户行为日志
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0

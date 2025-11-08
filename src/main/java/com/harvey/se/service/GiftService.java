@@ -1,6 +1,7 @@
 package com.harvey.se.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.harvey.se.pojo.dto.GiftInfoDto;
 import com.harvey.se.pojo.entity.Gift;
 
 /**
@@ -11,4 +12,9 @@ import com.harvey.se.pojo.entity.Gift;
  * @date 2025-11-08 06:51
  */
 public interface GiftService extends IService<Gift> {
+    void insert(GiftInfoDto giftInfoDto);
+
+    void delete(Long id);
+
+    void update(GiftInfoDto giftInfoDto);
 }

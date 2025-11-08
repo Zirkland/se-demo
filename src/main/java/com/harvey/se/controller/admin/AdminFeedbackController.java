@@ -22,7 +22,7 @@ import java.text.ParseException;
 import java.util.List;
 
 /**
- * TODO 管理键盘
+ * 管理键盘
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
@@ -85,11 +85,7 @@ public class AdminFeedbackController {
         } catch (ParseException e) {
             throw new BadRequestException("错误的日期格式", e);
         }
-        return new Result<>(feedbackService.queryFeedback(
-                dateRange,
-                constantsInitializer.initPage(page, limit),
-                true
-        ));
+        return new Result<>(feedbackService.queryFeedback(dateRange, constantsInitializer.initPage(page, limit), true));
     }
 
     @GetMapping(value = "/user/{user-id}/{read}/{limit}/{page}")
@@ -101,11 +97,7 @@ public class AdminFeedbackController {
             @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer limit,
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
-        return new Result<>(feedbackService.queryFeedback(
-                userId,
-                constantsInitializer.initPage(page, limit),
-                false
-        ));
+        return new Result<>(feedbackService.queryFeedback(userId, constantsInitializer.initPage(page, limit), false));
     }
 
 
