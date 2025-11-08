@@ -3,6 +3,7 @@ package com.harvey.se.util;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.harvey.se.pojo.vo.DateRange;
+import com.harvey.se.pojo.vo.IntRange;
 import com.harvey.se.properties.ConstantsProperties;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +44,10 @@ public class ConstantsInitializer {
         } else {
             return ServerConstants.DATE_TIME_FORMAT.parse(dateString);
         }
+    }
+
+    public static IntRange initIntRange(Integer lower, Integer upper) {
+        return new IntRange(lower, upper);
     }
 
     public static Date nowDateTime() {

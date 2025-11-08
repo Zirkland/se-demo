@@ -14,9 +14,14 @@ public class RedisConstants {
     public static final String CACHE_KEY_PRE = "se:cache:";
     public static final String SEARCH_HISTORY = "se:cache:search:history:";
 
+    public static class Point {
+        public static final String FEEDBACK = CACHE_KEY_PRE + "point:feedback:";
+
+    }
+
     public static class User {
         public static final String LOCK_KEY = LOCK_KEY_PRE + "user:";
-        public static final String TOKEN_CACHE_KEY = CACHE_KEY_PRE + "user:token:";
+        public static final String USER_CACHE_KEY = CACHE_KEY_PRE + "user:token:";
         public static final String REQUEST_TIME_FIELD = "request_times";
         public static final String ID_FIELD = "id";
         public static final String NICKNAME_FIELD = "nickname";

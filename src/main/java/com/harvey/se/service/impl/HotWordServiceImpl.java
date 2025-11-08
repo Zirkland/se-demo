@@ -38,7 +38,7 @@ public class HotWordServiceImpl extends ServiceImpl<HotWordMapper, HotWord> impl
                 .page(constantsInitializer.initPage(1, limit))
                 .getRecords()
                 .stream()
-                .map(HotWordDto::new)
+                .map(HotWordDto::adapte)
                 .collect(Collectors.toList());
     }
 

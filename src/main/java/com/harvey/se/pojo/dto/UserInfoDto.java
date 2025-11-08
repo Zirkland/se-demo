@@ -1,5 +1,7 @@
 package com.harvey.se.pojo.dto;
 
+import com.harvey.se.exception.BadRequestException;
+import com.harvey.se.exception.ResourceNotFountException;
 import com.harvey.se.pojo.entity.User;
 import com.harvey.se.pojo.enums.UserRole;
 import io.swagger.annotations.ApiModel;
@@ -21,7 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "用于管理端, 信息更详细")
-public class UserEntityDto {
+public class UserInfoDto {
 
     /**
      * 主键
@@ -62,20 +64,26 @@ public class UserEntityDto {
     private UserRole role;
 
 
-    public UserEntityDto(User user) {
-        this(
-                user.getId(),
-                user.getPhone(),
-                user.getNickname(),
-                user.getPoints(),
-                user.getCreateTime(),
-                user.getUpdateTime(),
-                user.getRole()
+    public static UserInfoDto adapte(User entity) {
+        if (entity == null) {
+            throw new ResourceNotFountException("请求不存在的资源");
+        }
+        return new UserInfoDto(
+                entity.getId(),
+                entity.getPhone(),
+                entity.getNickname(),
+                entity.getPoints(),
+                entity.getCreateTime(),
+                entity.getUpdateTime(),
+                entity.getRole()
         );
     }
 
-    public UserEntityDto(ConsultationContentWithUserEntityDto withConsultationContentDto) {
-        this(
+    public static UserInfoDto adapte(ConsultationContentWithUserEntityDto withConsultationContentDto) {
+        if (withConsultationContentDto == null) {
+            throw new BadRequestException("请求的参数不存在");
+        }
+        return new UserInfoDto(
                 withConsultationContentDto.getUserId(),
                 withConsultationContentDto.getPhone(),
                 withConsultationContentDto.getNickname(),

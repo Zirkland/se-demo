@@ -1,12 +1,24 @@
 package com.harvey.se.service.impl;
 
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.harvey.se.dao.GiftMapper;
+import com.harvey.se.exception.BadRequestException;
+import com.harvey.se.pojo.dto.GiftDto;
 import com.harvey.se.pojo.dto.GiftInfoDto;
+import com.harvey.se.pojo.dto.UserDto;
 import com.harvey.se.pojo.entity.Gift;
+import com.harvey.se.pojo.vo.IntRange;
 import com.harvey.se.service.GiftService;
+import com.harvey.se.service.ServiceUtil;
+import com.harvey.se.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -46,5 +58,46 @@ public class GiftServiceImpl extends ServiceImpl<GiftMapper, Gift> implements Gi
         if (!updated) {
             log.warn("更新 {} 失败", gift);
         }
+    }
+
+    @Resource
+    private UserService userService;
+
+    @Override
+    public void consume(UserDto user, Long giftId) {
+        // 1. 查询花费
+        Integer cost = new LambdaQueryChainWrapper<>(baseMapper).select(Gift::getCost)
+                .eq(Gift::getId, giftId)
+                .one()
+                .getCost();
+        if (cost == null) {
+            throw new BadRequestException("do not exist gift: " + giftId);
+        }
+        // 2. 用户point减少
+        userService.increasePoint(user.getId(), user.getPoints(), -cost);
+    }
+
+    @Override
+    public GiftInfoDto queryDetail(Long id) {
+        return GiftInfoDto.adapte(getById(id));
+    }
+
+    @Override
+    public List<GiftDto> queryByCost(IntRange intRange, Page<Gift> page) {
+        return ServiceUtil.queryAndOrderWithInteger(
+                new LambdaQueryChainWrapper<>(baseMapper),
+                Gift::getCost,
+                intRange,
+                page
+        ).stream().map(GiftDto::adapte).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GiftDto> queryByPage(Page<Gift> page) {
+        return new LambdaQueryChainWrapper<>(baseMapper).page(page)
+                .getRecords()
+                .stream()
+                .map(GiftDto::adapte)
+                .collect(Collectors.toList());
     }
 }

@@ -1,9 +1,10 @@
 package com.harvey.se.controller.normal;
 
-import com.harvey.se.exception.UncompletedException;
 import com.harvey.se.pojo.dto.ConsultationContentDto;
 import com.harvey.se.pojo.vo.Result;
 import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.service.ConsultationContentService;
+import com.harvey.se.util.UserHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -12,8 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+
 /**
- * TODO
+ * 用户购车需求咨询
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
@@ -25,13 +28,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/consultation-content")
 @EnableConfigurationProperties(ConstantsProperties.class)
 public class ConsultationContentController {
+    @Resource
+    private ConsultationContentService consultationContentService;
+
     @GetMapping(value = "/me")
     @ApiOperation("查询自己的购车咨询信息")
     @ApiResponse(code = 200, message = "如果未设置, 则返回默认的")
     public Result<ConsultationContentDto> consultationByUser() {
         // 查询自己的购车需求
         // 如果还没有, 就返回默认的
-        throw new UncompletedException("查询自己的购车咨询信息");
+        return new Result<>(consultationContentService.queryByUser(UserHolder.currentUserId()));
     }
 
     @PutMapping(value = "/update")
@@ -41,6 +47,6 @@ public class ConsultationContentController {
             ConsultationContentDto consultationContentDto) {
         // 更新自己的购车需求
         // 如果还没有, 就插入
-        throw new UncompletedException("更新本用户的购车咨询信息");
+        return new Result<>(consultationContentService.upsert(UserHolder.currentUserId(), consultationContentDto));
     }
 }

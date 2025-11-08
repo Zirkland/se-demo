@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.harvey.se.pojo.dto.UserDto;
-import com.harvey.se.pojo.dto.UserEntityDto;
+import com.harvey.se.pojo.dto.UserInfoDto;
 import com.harvey.se.pojo.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -83,9 +83,10 @@ public class User implements Serializable {
         this.updateTime = LocalDateTime.now();
     }
 
-    public User(UserEntityDto userEntityDto) {
-        this(userEntityDto.getId(), userEntityDto.getPhone(), null, userEntityDto.getNickname(),
-                userEntityDto.getPoints(), null, null, userEntityDto.getRole()
+    public User(UserInfoDto userInfoDto) {
+        this(
+                userInfoDto.getId(), userInfoDto.getPhone(), null, userInfoDto.getNickname(),
+                userInfoDto.getPoints(), null, null, userInfoDto.getRole()
         );
     }
 }

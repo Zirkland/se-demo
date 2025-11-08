@@ -1,5 +1,6 @@
 package com.harvey.se.pojo.dto;
 
+import com.harvey.se.exception.ResourceNotFountException;
 import com.harvey.se.pojo.entity.Feedback;
 import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.ApiModel;
@@ -37,7 +38,16 @@ public class FeedbackDto {
     @ApiModelProperty(value = "是否已读")
     private Boolean read;
 
-    public FeedbackDto(Feedback entity) {
-        this(entity.getId(), entity.getUserId(), entity.getText(), entity.getCreateTime(), entity.getRead());
+    public static FeedbackDto adapte(Feedback entity) {
+        if (entity == null) {
+            throw new ResourceNotFountException("请求不存在的资源");
+        }
+        return new FeedbackDto(
+                entity.getId(),
+                entity.getUserId(),
+                entity.getText(),
+                entity.getCreateTime(),
+                entity.getRead()
+        );
     }
 }

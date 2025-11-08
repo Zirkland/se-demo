@@ -17,6 +17,7 @@ public class ConstantsProperties {
     private String clearClickHistoryWaitSeconds = String.valueOf(ServerConstants.CLEAR_CLICK_HISTORY_WAIT_MILLIONS);
     private String maxPageSize = ServerConstants.MAX_PAGE_SIZE;
     private String defaultPageSize = ServerConstants.DEFAULT_PAGE_SIZE;
+    private String workersOnInsertUserAction = String.valueOf(ServerConstants.WORKERS_ON_INSERT_USER_ACTION);
     private String redisHost;
     private String redisPassword;
 }

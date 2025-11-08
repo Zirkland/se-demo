@@ -130,7 +130,7 @@ public class UserController {
     @PostMapping("/logout")
     public Result<Null> logout(
             @ApiParam(hidden = true) HttpServletResponse response) {
-        String tokenKey = RedisConstants.User.TOKEN_CACHE_KEY + UserHolder.currentUserId();
+        String tokenKey = RedisConstants.User.USER_CACHE_KEY + UserHolder.currentUserId();
         stringRedisTemplate.delete(tokenKey);
         response.setStatus(401);
         return Result.ok();

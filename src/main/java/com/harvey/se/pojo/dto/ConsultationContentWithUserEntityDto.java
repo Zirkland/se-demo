@@ -76,7 +76,7 @@ public class ConsultationContentWithUserEntityDto {
     private String otherRequirements;
 
 
-    public static ConsultationContentWithUserEntityDto instance(
+    public static ConsultationContentWithUserEntityDto combine(
             ConsultationContent consultationContent, User user) {
         return Objects.equals(consultationContent.getUserId(), user.getId()) ? new ConsultationContentWithUserEntityDto(
                 user.getId(),
@@ -96,8 +96,8 @@ public class ConsultationContentWithUserEntityDto {
         ) : null;
     }
 
-    public static ConsultationContentWithUserEntityDto instance(
-            ConsultationContentDto consultationContent, UserEntityDto user) {
+    public static ConsultationContentWithUserEntityDto combine(
+            ConsultationContentDto consultationContent, UserInfoDto user) {
         return Objects.equals(consultationContent.getUserId(), user.getId()) ? new ConsultationContentWithUserEntityDto(
                 user.getId(),
                 user.getPhone(),

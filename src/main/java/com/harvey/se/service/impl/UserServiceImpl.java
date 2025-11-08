@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.harvey.se.dao.UserMapper;
@@ -13,7 +14,7 @@ import com.harvey.se.exception.UnauthorizedException;
 import com.harvey.se.pojo.dto.LoginFormDto;
 import com.harvey.se.pojo.dto.RegisterFormDto;
 import com.harvey.se.pojo.dto.UserDto;
-import com.harvey.se.pojo.dto.UserEntityDto;
+import com.harvey.se.pojo.dto.UserInfoDto;
 import com.harvey.se.pojo.entity.User;
 import com.harvey.se.properties.ConstantsProperties;
 import com.harvey.se.properties.JwtProperties;
@@ -217,10 +218,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!StrUtil.isEmpty(nickname)) {
             user.setNickname(nickname);
         }
-        // ignore update of role
-        // ignore update of points
+        // ignore upsert of role
+        // ignore upsert of points
         // 更新
-        String tokenKey = RedisConstants.User.TOKEN_CACHE_KEY + jwtTool.parseToken(token);
+        String tokenKey = RedisConstants.User.USER_CACHE_KEY + jwtTool.parseToken(token);
         String lastTime = Optional.ofNullable((String) stringRedisTemplate.opsForHash()
                         .get(tokenKey, RedisConstants.User.REQUEST_TIME_FIELD))
                 .orElseGet(() -> constantsProperties.getRestrictRequestTimes());
@@ -239,7 +240,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (userDTO == null) {
             throw new BadRequestException("用户信息为null");
         }
-        String tokenKey = RedisConstants.User.TOKEN_CACHE_KEY + jwtTool.parseToken(token);
+        String tokenKey = RedisConstants.User.USER_CACHE_KEY + jwtTool.parseToken(token);
         saveUser2Redis(tokenKey, user2Map(userDTO), RedisConstants.ENTITY_CACHE_TTL);
     }
 
@@ -253,7 +254,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException {
         log.debug("queryMutexFixByLock");
-        String key = RedisConstants.User.TOKEN_CACHE_KEY + userId;
+        String key = RedisConstants.User.USER_CACHE_KEY + userId;
         // 从缓存查
         log.debug("用户:" + userId + "从缓存查");
         Map<Object, Object> userFieldMap = stringRedisTemplate.opsForHash().entries(key);
@@ -354,21 +355,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public UserEntityDto queryUserEntityById(Long userId) {
+    public UserInfoDto queryUserEntityById(Long userId) {
         User user = this.getById(userId);
         if (user == null) {
             throw new BadRequestException("Unknown user of:" + userId);
         }
-        return new UserEntityDto(user);
+        return UserInfoDto.adapte(user);
     }
 
     @Override
-    public List<UserEntityDto> queryUserEntityByPage(Page<User> page) {
-        return queryUserByPage(page).stream().map(UserEntityDto::new).collect(Collectors.toList());
+    public List<UserInfoDto> queryUserEntityByPage(Page<User> page) {
+        return queryUserByPage(page).stream().map(UserInfoDto::adapte).collect(Collectors.toList());
     }
 
     @Override
-    public void updateUserEntity(UserEntityDto newUser) {
+    public void updateUserEntity(UserInfoDto newUser) {
         if (newUser.getPhone() != null && !RegexUtils.isPhoneEffective(newUser.getPhone())) {
             // 不是合法的电话号码
             newUser.setPhone(null);
@@ -385,6 +386,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<User> queryUserByPage(Page<User> page) {
         return super.lambdaQuery().page(page).getRecords();
+    }
+
+    @Override
+    public void loadCache(Long id) throws InterruptedException {
+        this.queryUserByIdWithRedisson(id);
+    }
+
+    @Override
+    public void increasePoint(Long userId, int currentPoint, int point) {
+        // 1. 更新数据
+        int nextPoint = currentPoint + point;
+        if (nextPoint < 0) {
+            throw new BadRequestException("余额不足");
+        }
+        boolean updated = super.update(new LambdaUpdateChainWrapper<>(baseMapper).set(User::getPoints, nextPoint)
+                .eq(User::getId, userId));
+        // 2. 删除缓存
+        if (!updated) {
+            throw new IllegalStateException(userId + "增加 point " + point + "失败!");
+        }
+        stringRedisTemplate.delete(RedisConstants.User.USER_CACHE_KEY + userId);
     }
 
 }

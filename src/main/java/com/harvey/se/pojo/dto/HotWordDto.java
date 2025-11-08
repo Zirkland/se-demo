@@ -1,5 +1,6 @@
 package com.harvey.se.pojo.dto;
 
+import com.harvey.se.exception.ResourceNotFountException;
 import com.harvey.se.pojo.entity.HotWord;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,8 +29,11 @@ public class HotWordDto {
     @ApiModelProperty(value = "频率")
     private Integer frequency;
 
-    public HotWordDto(HotWord entity) {
-        this(entity.getId(), entity.getWord(), entity.getFrequency());
+    public static HotWordDto adapte(HotWord entity) {
+        if (entity == null) {
+            throw new ResourceNotFountException("请求不存在的资源");
+        }
+        return new HotWordDto(entity.getId(), entity.getWord(), entity.getFrequency());
     }
 
 }

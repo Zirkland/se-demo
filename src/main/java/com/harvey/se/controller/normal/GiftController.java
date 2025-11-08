@@ -1,12 +1,14 @@
 package com.harvey.se.controller.normal;
 
-import com.harvey.se.exception.UncompletedException;
 import com.harvey.se.pojo.dto.GiftDto;
 import com.harvey.se.pojo.dto.GiftInfoDto;
 import com.harvey.se.pojo.vo.Null;
 import com.harvey.se.pojo.vo.Result;
 import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.service.GiftService;
+import com.harvey.se.util.ConstantsInitializer;
 import com.harvey.se.util.ServerConstants;
+import com.harvey.se.util.UserHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -30,6 +33,12 @@ import java.util.List;
 @RequestMapping("/gift")
 @EnableConfigurationProperties(ConstantsProperties.class)
 public class GiftController {
+    @Resource
+    private GiftService giftService;
+
+    @Resource
+    private ConstantsInitializer constantsInitializer;
+
     @GetMapping(value = "/all/{limit}/{page}")
     @ApiOperation("分页查询Gift的简略信息")
     @ApiResponse(code = 200, message = "按照id升序")
@@ -39,7 +48,9 @@ public class GiftController {
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 不提供就使用默认值
-        throw new UncompletedException("分页查询商品简略信息");
+        return new Result<>(giftService.queryByPage(
+                constantsInitializer.initPage(page, limit)
+        ));
     }
 
     @GetMapping(value = "/cost-in-range/{lower}/{upper}/{limit}/{page}")
@@ -55,7 +66,10 @@ public class GiftController {
             @PathVariable(value = "page", required = false) @ApiParam(value = "页号", defaultValue = "1")
             Integer page) {
         // 按照花销排序, 使用升序排序
-        throw new UncompletedException("依据积分花费的上下限来进行查询");
+        return new Result<>(giftService.queryByCost(
+                ConstantsInitializer.initIntRange(lower, upper),
+                constantsInitializer.initPage(page, limit)
+        ));
     }
 
     @GetMapping(value = "/detail/{id}")
@@ -64,7 +78,7 @@ public class GiftController {
             @PathVariable(value = "id")
             @ApiParam(value = "目标礼品id, 依据用户选择的商品简略信息来获取", required = true) Long id) {
         // 查礼品询详细信息
-        throw new UncompletedException("获取礼品细节信息");
+        return new Result<>(giftService.queryDetail(id));
     }
 
     @PutMapping(value = "/consume/")
@@ -72,6 +86,7 @@ public class GiftController {
     public Result<Null> consume(
             @RequestBody @ApiParam(value = "目标礼品id", required = true) Long id) {
         // 进行消费
-        throw new UncompletedException("消费积分换取礼品");
+        giftService.consume(UserHolder.getUser(), id);
+        return Result.ok();
     }
 }

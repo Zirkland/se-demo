@@ -19,4 +19,5 @@ public class ServerConstants {
     public static final String DATE_TIME_FORMAT_STRING = "yyyy-MM-dd HH:mm:ss";
     public static final long CLEAR_CLICK_HISTORY_WAIT_MILLIONS = 10 * 60 * 1000;
     public static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat(DATE_TIME_FORMAT_STRING);
+    public static final int WORKERS_ON_INSERT_USER_ACTION = 5;
 }

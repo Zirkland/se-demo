@@ -8,6 +8,7 @@ import com.harvey.se.dao.UserActionLogMapper;
 import com.harvey.se.pojo.dto.UserActionLogDto;
 import com.harvey.se.pojo.entity.UserActionLog;
 import com.harvey.se.pojo.vo.DateRange;
+import com.harvey.se.properties.ConstantsProperties;
 import com.harvey.se.service.ServiceUtil;
 import com.harvey.se.service.UserActionLogService;
 import com.harvey.se.util.ExecutorServiceUtil;
@@ -31,11 +32,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserActionLogServiceImpl extends ServiceImpl<UserActionLogMapper, UserActionLog> implements
         UserActionLogService {
+    private final ExecutorService executorService;
 
-    private final ExecutorService EXECUTOR_SERVICE = ExecutorServiceUtil.newFixedThreadPool(
-            3,
-            "user-action-log-insert-worker-"
-    );
+    public UserActionLogServiceImpl(ConstantsProperties constantsProperties) {
+        executorService = ExecutorServiceUtil.newFixedThreadPool(
+                Integer.parseInt(constantsProperties.getWorkersOnInsertUserAction()),
+                "user-action-log-insert-worker-"
+        );
+    }
+
 
     @Override
     public List<UserActionLogDto> longCost(Integer longerThan, Page<UserActionLog> page) {
@@ -44,7 +49,7 @@ public class UserActionLogServiceImpl extends ServiceImpl<UserActionLogMapper, U
                 .page(page)
                 .getRecords()
                 .stream()
-                .map(UserActionLogDto::new)
+                .map(UserActionLogDto::adapte)
                 .collect(Collectors.toList());
     }
 
@@ -58,13 +63,13 @@ public class UserActionLogServiceImpl extends ServiceImpl<UserActionLogMapper, U
                         page
                 )
                 .stream()
-                .map(UserActionLogDto::new)
+                .map(UserActionLogDto::adapte)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void syncInsert(UserActionLog userActionLog) {
-        EXECUTOR_SERVICE.execute(() -> {
+        executorService.execute(() -> {
             boolean saved = super.save(userActionLog);
             if (!saved) {
                 log.warn("保存 {} 失败", userActionLog);

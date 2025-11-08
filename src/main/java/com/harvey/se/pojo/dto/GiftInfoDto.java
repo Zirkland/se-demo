@@ -1,5 +1,6 @@
 package com.harvey.se.pojo.dto;
 
+import com.harvey.se.exception.ResourceNotFountException;
 import com.harvey.se.pojo.entity.Gift;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -36,8 +37,11 @@ public class GiftInfoDto {
     @ApiModelProperty(value = "用于详情图片的URL3", required = true)
     private String pictureUrl3;
 
-    public GiftInfoDto(Gift entity) {
-        this(
+    public static GiftInfoDto adapte(Gift entity) {
+        if (entity == null) {
+            throw new ResourceNotFountException("请求不存在的资源");
+        }
+        return new GiftInfoDto(
                 entity.getId(),
                 entity.getCost(),
                 entity.getTitle(),

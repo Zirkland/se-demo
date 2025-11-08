@@ -1,5 +1,6 @@
 package com.harvey.se.pojo.dto;
 
+import com.harvey.se.exception.ResourceNotFountException;
 import com.harvey.se.pojo.entity.User;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,6 +33,9 @@ public class UserDto implements Serializable {
     }
 
     public UserDto(User user) {
+        if (user == null) {
+            throw new ResourceNotFountException("请求不存在的资源");
+        }
         this.role = user.getRole().getValue();
         this.id = user.getId();
         this.points = user.getPoints();

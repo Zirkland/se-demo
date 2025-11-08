@@ -1,5 +1,6 @@
 package com.harvey.se.pojo.dto;
 
+import com.harvey.se.exception.ResourceNotFountException;
 import com.harvey.se.pojo.entity.UserActionLog;
 import com.harvey.se.util.ServerConstants;
 import io.swagger.annotations.ApiModel;
@@ -45,8 +46,11 @@ public class UserActionLogDto {
     @ApiModelProperty(value = "响应时间损耗, 单位ms")
     private Integer requestTimeCost;
 
-    public UserActionLogDto(UserActionLog entity) {
-        this(
+    public static UserActionLogDto adapte(UserActionLog entity) {
+        if (entity == null) {
+            throw new ResourceNotFountException("请求不存在的资源");
+        }
+        return new UserActionLogDto(
                 entity.getId(),
                 entity.getUserId(),
                 entity.getIpAddress(),

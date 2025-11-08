@@ -19,4 +19,6 @@ public interface FeedbackService extends IService<Feedback> {
     List<FeedbackDto> queryFeedback(Long userId, Page<Feedback> page, boolean read);
 
     void read(Long id);
+
+    void saveNew(Feedback feedback);
 }

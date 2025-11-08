@@ -1,5 +1,7 @@
 package com.harvey.se.pojo.dto;
 
+import com.harvey.se.exception.BadRequestException;
+import com.harvey.se.exception.ResourceNotFountException;
 import com.harvey.se.pojo.entity.ConsultationContent;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -46,8 +48,11 @@ public class ConsultationContentDto {
     @ApiModelProperty(value = "其他要求, 默认(无)")
     private String otherRequirements;
 
-    public ConsultationContentDto(ConsultationContentWithUserEntityDto withUserDto) {
-        this(
+    public static ConsultationContentDto adapte(ConsultationContentWithUserEntityDto withUserDto) {
+        if (withUserDto == null) {
+            throw new BadRequestException("请求参数不存在");
+        }
+        return new ConsultationContentDto(
                 withUserDto.getUserId(),
                 withUserDto.getLowerBound(),
                 withUserDto.getUpperBound(),
@@ -59,8 +64,11 @@ public class ConsultationContentDto {
         );
     }
 
-    public ConsultationContentDto(ConsultationContent entity) {
-        this(
+    public static ConsultationContentDto adapte(ConsultationContent entity) {
+        if (entity == null) {
+            throw new ResourceNotFountException("请求不存在的资源");
+        }
+        return new ConsultationContentDto(
                 entity.getUserId(),
                 entity.getLowerBound(),
                 entity.getUpperBound(),

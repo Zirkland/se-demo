@@ -35,7 +35,7 @@ public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> i
         );
         return ServiceUtil.queryAndOrderWithDate(wrapper, Feedback::getCreateTime, dateRange, page)
                 .stream()
-                .map(FeedbackDto::new)
+                .map(FeedbackDto::adapte)
                 .collect(Collectors.toList());
     }
 
@@ -46,7 +46,7 @@ public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> i
                 .page(page)
                 .getRecords()
                 .stream()
-                .map(FeedbackDto::new)
+                .map(FeedbackDto::adapte)
                 .collect(Collectors.toList());
     }
 
@@ -60,6 +60,16 @@ public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> i
         boolean updated = super.update(updateWrapper);
         if (!updated) {
             log.warn("未成功更新read");
+        }
+    }
+
+    @Override
+    public void saveNew(Feedback feedback) {
+        feedback.setId(null);
+        feedback.setRead(false);
+        boolean saved = super.save(feedback);
+        if (!saved) {
+            log.warn("保存反馈信息 {} 失败" + feedback);
         }
     }
 }

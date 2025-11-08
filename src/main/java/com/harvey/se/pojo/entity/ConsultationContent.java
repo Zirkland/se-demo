@@ -59,4 +59,13 @@ public class ConsultationContent {
     }
 
 
+    public void fillNullWith(ConsultationContent defaultEntity) {
+        lowerBound = lowerBound == null ? defaultEntity.lowerBound : lowerBound;
+        upperBound = upperBound == null ? defaultEntity.upperBound : upperBound;
+        preferredCarModel = preferredCarModel == null ? defaultEntity.preferredCarModel : preferredCarModel;
+        mainUseCase = mainUseCase == null ? defaultEntity.mainUseCase : mainUseCase;
+        preferredFuelType = preferredFuelType == null ? defaultEntity.preferredFuelType : preferredFuelType;
+        preferredBrand = preferredBrand == null ? defaultEntity.preferredBrand : preferredBrand;
+        otherRequirements = otherRequirements == null ? defaultEntity.otherRequirements : otherRequirements;
+    }
 }

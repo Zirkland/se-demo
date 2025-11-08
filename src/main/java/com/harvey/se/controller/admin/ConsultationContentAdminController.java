@@ -3,7 +3,7 @@ package com.harvey.se.controller.admin;
 import com.harvey.se.pojo.dto.ConsultationContentDto;
 import com.harvey.se.pojo.dto.ConsultationContentWithUserEntityDto;
 import com.harvey.se.pojo.dto.HotWordDto;
-import com.harvey.se.pojo.dto.UserEntityDto;
+import com.harvey.se.pojo.dto.UserInfoDto;
 import com.harvey.se.pojo.entity.User;
 import com.harvey.se.pojo.vo.Result;
 import com.harvey.se.properties.ConstantsProperties;
@@ -82,8 +82,8 @@ public class ConsultationContentAdminController {
             @PathVariable(value = "id") @ApiParam("用户id") Long userId) {
         // 不提供就使用默认值
         ConsultationContentDto consultationContentDto = consultationContentService.queryByUser(userId);
-        UserEntityDto userEntityDto = userService.queryUserEntityById(userId);
-        return new Result<>(ConsultationContentWithUserEntityDto.instance(consultationContentDto, userEntityDto));
+        UserInfoDto userInfoDto = userService.queryUserEntityById(userId);
+        return new Result<>(ConsultationContentWithUserEntityDto.combine(consultationContentDto, userInfoDto));
     }
 
 

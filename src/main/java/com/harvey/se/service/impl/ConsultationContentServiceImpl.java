@@ -9,6 +9,7 @@ import com.harvey.se.pojo.dto.ConsultationContentWithUserEntityDto;
 import com.harvey.se.pojo.entity.ConsultationContent;
 import com.harvey.se.pojo.entity.User;
 import com.harvey.se.service.ConsultationContentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,11 +27,12 @@ import java.util.stream.Collectors;
  * @see ConsultationContentService
  */
 @Service
+@Slf4j
 public class ConsultationContentServiceImpl extends
         ServiceImpl<ConsultationContentMapper, ConsultationContent> implements ConsultationContentService {
     @Override
     public ConsultationContentDto queryByUser(Long userId) {
-        return new ConsultationContentDto(getById(userId));
+        return ConsultationContentDto.adapte(getById(userId));
     }
 
     @Override
@@ -38,7 +40,7 @@ public class ConsultationContentServiceImpl extends
         return new LambdaQueryChainWrapper<>(baseMapper).page(page)
                 .getRecords()
                 .stream()
-                .map(ConsultationContentDto::new)
+                .map(ConsultationContentDto::adapte)
                 .collect(Collectors.toList());
     }
 
@@ -53,9 +55,34 @@ public class ConsultationContentServiceImpl extends
                 .stream()
                 .collect(Collectors.toMap(ConsultationContent::getUserId, e -> e));
         return userList.stream()
-                .map(user -> ConsultationContentWithUserEntityDto.instance(Optional.ofNullable(consultationContentMap.get(
+                .map(user -> ConsultationContentWithUserEntityDto.combine(Optional.ofNullable(consultationContentMap.get(
                         user.getId())).orElse(ConsultationContent.DEFAULT), user))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ConsultationContentDto upsert(Long userId, ConsultationContentDto consultationContentDto) {
+        consultationContentDto.setUserId(userId);
+        boolean exist = exist(userId);
+        boolean successful;
+        ConsultationContent entity = new ConsultationContent(consultationContentDto);
+        if (exist) {
+            successful = super.updateById(entity);
+        } else {
+            entity.fillNullWith(ConsultationContent.DEFAULT);
+            successful = super.save(entity);
+        }
+        if (!successful) {
+            log.warn("upsert {} 失败", entity);
+        }
+        return consultationContentDto;
+    }
+
+    private boolean exist(Long userId) {
+        return new LambdaQueryChainWrapper<>(baseMapper).select(ConsultationContent::getUserId)
+                       .eq(ConsultationContent::getUserId, userId)
+                       .last("LIMIT 1")
+                       .one() != null;
     }
 
 

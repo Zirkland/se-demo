@@ -22,4 +22,5 @@ public interface ConsultationContentService extends IService<ConsultationContent
 
     List<ConsultationContentWithUserEntityDto> combineWithUsers(List<User> userList);
 
+    ConsultationContentDto upsert(Long aLong, ConsultationContentDto consultationContentDto);
 }

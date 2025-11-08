@@ -1,7 +1,7 @@
 package com.harvey.se.exception;
 
 /**
- * TODO  UncompletedException的异常
+ * UncompletedException的异常
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
@@ -22,10 +22,7 @@ public class UncompletedException extends RuntimeException {
     }
 
     protected UncompletedException(
-            String message,
-            Throwable cause,
-            boolean enableSuppression,
-            boolean writableStackTrace) {
+            String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

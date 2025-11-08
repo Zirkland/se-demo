@@ -2,7 +2,7 @@ package com.harvey.se.controller.admin;
 
 import com.harvey.se.exception.BadRequestException;
 import com.harvey.se.pojo.dto.UserDto;
-import com.harvey.se.pojo.dto.UserEntityDto;
+import com.harvey.se.pojo.dto.UserInfoDto;
 import com.harvey.se.pojo.entity.User;
 import com.harvey.se.pojo.vo.Null;
 import com.harvey.se.pojo.vo.Result;
@@ -51,7 +51,7 @@ public class AdminUserController {
             Map<String, String> map = new HashMap<>();
             int token = i + 10000;
             System.out.println(token);
-            String key = RedisConstants.User.TOKEN_CACHE_KEY + token;
+            String key = RedisConstants.User.USER_CACHE_KEY + token;
             map.put(RedisConstants.User.ID_FIELD, String.valueOf(token));
             map.put(RedisConstants.User.NICKNAME_FIELD, User.DEFAULT_NICKNAME);
             stringRedisTemplate.opsForHash().putAll(key, map);
@@ -64,10 +64,10 @@ public class AdminUserController {
      */
     @GetMapping("/one/{id}")
     @ApiOperation("根据id查询用户")
-    public Result<UserEntityDto> queryUserEntityById(
+    public Result<UserInfoDto> queryUserEntityById(
             @PathVariable("id") @ApiParam(value = "目标用户的id", required = true) Long userId) {
-        UserEntityDto userEntityDto = userService.queryUserEntityById(userId);
-        return new Result<>(userEntityDto);
+        UserInfoDto userInfoDto = userService.queryUserEntityById(userId);
+        return new Result<>(userInfoDto);
     }
 
     /**
@@ -75,16 +75,16 @@ public class AdminUserController {
      */
     @GetMapping("/all/{limit}/{page}")
     @ApiOperation("分页查询用户")
-    public Result<List<UserEntityDto>> queryUserEntityByPage(
+    public Result<List<UserInfoDto>> queryUserEntityByPage(
             @PathVariable(value = "limit", required = false) @ApiParam(value = "页号,从1开始", defaultValue = "1")
             Integer limit,
             @PathVariable(value = "page", required = false)
             @ApiParam(value = "页长", defaultValue = ServerConstants.DEFAULT_PAGE_SIZE) Integer page) {
-        List<UserEntityDto> userEntityDto = userService.queryUserEntityByPage(constantsInitializer.initPage(
+        List<UserInfoDto> userInfoDto = userService.queryUserEntityByPage(constantsInitializer.initPage(
                 page,
                 limit
         ));
-        return new Result<>(userEntityDto);
+        return new Result<>(userInfoDto);
     }
 
     /**
@@ -95,7 +95,7 @@ public class AdminUserController {
     public Result<Null> updateUserEntity(
             @RequestBody
             @ApiParam(value = "更新的用户实体, 字段为null时表示此字段不变, id是索引对应实体的依据", required = true)
-            UserEntityDto newUser) {
+            UserInfoDto newUser) {
         if (newUser == null || newUser.getId() == null) {
             throw new BadRequestException("except a new user in request body");
         }

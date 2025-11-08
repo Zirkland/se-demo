@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import com.harvey.se.exception.BadRequestException;
 import com.harvey.se.pojo.dto.UserDto;
 import com.harvey.se.properties.ConstantsProperties;
+import com.harvey.se.service.UserService;
+import com.harvey.se.util.ClientIpUtil;
 import com.harvey.se.util.JwtTool;
 import com.harvey.se.util.RedisConstants;
 import com.harvey.se.util.UserHolder;
@@ -36,6 +38,8 @@ public class ExpireInterceptor implements HandlerInterceptor {
     private JwtTool jwtTool;
     @Resource
     private ConstantsProperties constantsProperties;
+    @Resource
+    private UserService userService;
 
 
     @Override
@@ -52,10 +56,12 @@ public class ExpireInterceptor implements HandlerInterceptor {
         // 获取请求头中的token
         String id;
         if (token == null || token.isEmpty()) {
-            id = request.getRemoteAddr();
+            id = ClientIpUtil.get(request);
         } else {
             try {
-                id = jwtTool.parseToken(token).toString();
+                Long userId = jwtTool.parseToken(token);
+                id = userId.toString();
+                userService.loadCache(userId); // 更新一下缓存
             } catch (Exception e) {
                 log.warn(e.getMessage());
                 id = request.getRemoteAddr();
@@ -76,12 +82,12 @@ public class ExpireInterceptor implements HandlerInterceptor {
     public UserDto doPreHandle(String id) {
 
         // 获取user数据
-        String tokenKey = RedisConstants.User.TOKEN_CACHE_KEY + id;
+        String tokenKey = RedisConstants.User.USER_CACHE_KEY + id;
         Map<Object, Object> userFieldMap = stringRedisTemplate.opsForHash().entries(tokenKey);
 
         if (userFieldMap.isEmpty()) {
             // entries不会返回null
-            // 用户不存在,就是游客,也给他限个流
+            // 用户不存在Redis,就是游客,也给他限个流
             stringRedisTemplate.opsForHash()
                     .put(tokenKey, REQUEST_TIME_FIELD, constantsProperties.getRestrictRequestTimes());
             userFieldMap.put(REQUEST_TIME_FIELD, constantsProperties.getRestrictRequestTimes());
@@ -118,7 +124,7 @@ public class ExpireInterceptor implements HandlerInterceptor {
             HttpServletRequest request,
             HttpServletResponse response,
             Object handler, Exception ex) {
-        doAfter(request.getRemoteAddr());
+        doAfter(ClientIpUtil.get(request));
     }
 
     public void doAfter(String ip) {
@@ -128,7 +134,7 @@ public class ExpireInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             id = ip;
         }
-        String tokenKey = RedisConstants.User.TOKEN_CACHE_KEY + id;
+        String tokenKey = RedisConstants.User.USER_CACHE_KEY + id;
         Object timeFiled = stringRedisTemplate.opsForHash().get(tokenKey, REQUEST_TIME_FIELD);
         if (timeFiled != null) {
             stringRedisTemplate.opsForHash().increment(tokenKey, REQUEST_TIME_FIELD, 1);

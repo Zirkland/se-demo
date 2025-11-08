@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.harvey.se.pojo.vo.DateRange;
+import com.harvey.se.pojo.vo.IntRange;
 
 import java.util.Date;
 import java.util.List;
@@ -20,15 +21,29 @@ public class ServiceUtil {
     }
 
     public static <T> List<T> queryAndOrderWithDate(
-            LambdaQueryChainWrapper<T> wrapper, SFunction<T, Date> dateColumn, DateRange dateRange, Page<T> page) {
-        if (dateRange.isForward()) {
-            wrapper.ge(dateRange.getFrom() != null, dateColumn, dateRange.getFrom())
-                    .le(dateRange.getTo() != null, dateColumn, dateRange.getTo())
-                    .orderByAsc(dateColumn, (SFunction<T, Date>[]) null);
+            LambdaQueryChainWrapper<T> wrapper, SFunction<T, Date> rangeColumn, DateRange range, Page<T> page) {
+        if (range.isForward()) {
+            wrapper.ge(range.getFrom() != null, rangeColumn, range.getFrom())
+                    .le(range.getTo() != null, rangeColumn, range.getTo())
+                    .orderByAsc(rangeColumn, (SFunction<T, Date>[]) null);
         } else {
-            wrapper.ge(dateRange.getTo() != null, dateColumn, dateRange.getTo())
-                    .le(dateRange.getFrom() != null, dateColumn, dateRange.getFrom())
-                    .orderByDesc(dateColumn, (SFunction<T, Date>[]) null);
+            wrapper.ge(range.getTo() != null, rangeColumn, range.getTo())
+                    .le(range.getFrom() != null, rangeColumn, range.getFrom())
+                    .orderByDesc(rangeColumn, (SFunction<T, Date>[]) null);
+        }
+        return wrapper.page(page).getRecords();
+    }
+
+    public static <T> List<T> queryAndOrderWithInteger(
+            LambdaQueryChainWrapper<T> wrapper, SFunction<T, Integer> rangeColumn, IntRange range, Page<T> page) {
+        if (range.isForward()) {
+            wrapper.ge(range.getLower() != null, rangeColumn, range.getLower())
+                    .le(range.getUpper() != null, rangeColumn, range.getUpper())
+                    .orderByAsc(rangeColumn, (SFunction<T, Date>[]) null);
+        } else {
+            wrapper.ge(range.getUpper() != null, rangeColumn, range.getUpper())
+                    .le(range.getLower() != null, rangeColumn, range.getLower())
+                    .orderByDesc(rangeColumn, (SFunction<T, Date>[]) null);
         }
         return wrapper.page(page).getRecords();
     }

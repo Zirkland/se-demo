@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.harvey.se.pojo.dto.LoginFormDto;
 import com.harvey.se.pojo.dto.RegisterFormDto;
 import com.harvey.se.pojo.dto.UserDto;
-import com.harvey.se.pojo.dto.UserEntityDto;
+import com.harvey.se.pojo.dto.UserInfoDto;
 import com.harvey.se.pojo.entity.User;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,11 +63,16 @@ public interface UserService extends IService<User> {
 
     UserDto queryUserById(Long userId);
 
-    UserEntityDto queryUserEntityById(Long userId);
+    UserInfoDto queryUserEntityById(Long userId);
 
-    List<UserEntityDto> queryUserEntityByPage(Page<User> page);
+    List<UserInfoDto> queryUserEntityByPage(Page<User> page);
 
-    void updateUserEntity(UserEntityDto newUser);
+    void updateUserEntity(UserInfoDto newUser);
 
-    List<User> queryUserByPage(Page<User> objectPage);
+    List<User> queryUserByPage(Page<User> page);
+
+    void loadCache(Long id) throws InterruptedException;
+
+
+    void increasePoint(Long userId, int currentPoint, int point);
 }

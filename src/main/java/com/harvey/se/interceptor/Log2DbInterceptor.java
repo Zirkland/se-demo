@@ -2,6 +2,7 @@ package com.harvey.se.interceptor;
 
 import com.harvey.se.pojo.entity.UserActionLog;
 import com.harvey.se.service.UserActionLogService;
+import com.harvey.se.util.ClientIpUtil;
 import com.harvey.se.util.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,11 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
 
 /**
- * 登录拦截器,会从Redis中查出用户的信息, 查到了就存入ThreadLocal
+ * 创建用户请求日志, 并将其存入数据库
  *
  * @author <a href="mailto:harvey.blocks@outlook.com">Harvey Blocks</a>
  * @version 1.0
- * @date 2024-01-03 13:32
+ * @date 2025-11-8 12:32
  */
 @Slf4j
 @Component
@@ -46,7 +47,7 @@ public class Log2DbInterceptor implements HandlerInterceptor {
         UserActionLog userActionLog = new UserActionLog(
                 null,
                 UserHolder.existUser() ? UserHolder.currentUserId() : null,
-                request.getRemoteAddr(),
+                ClientIpUtil.get(request),
                 request.getRequestURI(),
                 request.getMethod().toUpperCase(),
                 requestDate,
