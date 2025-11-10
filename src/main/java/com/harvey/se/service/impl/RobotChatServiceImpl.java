@@ -52,7 +52,7 @@ public class RobotChatServiceImpl implements RobotChatService {
     private JacksonUtil jacksonUtil;
     @Resource
     private RedissonClient redissonClient;
-    Application application = new Application();
+    private final Application application = new Application();
     @Resource
     private RobotChatProperties robotChatProperties;
     @Resource

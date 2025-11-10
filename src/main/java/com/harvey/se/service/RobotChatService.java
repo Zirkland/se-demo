@@ -17,5 +17,5 @@ public interface RobotChatService {
     List<ChatTextPiece> pullPieces(Long chatId, Integer limit);
 
 
-    Long chat(UserDto user, String message, int chatIndex) throws InterruptedException;
+    Long chat(UserDto user, String message, int chatIndex);
 }

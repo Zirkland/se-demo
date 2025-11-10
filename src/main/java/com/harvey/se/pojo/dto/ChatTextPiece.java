@@ -24,7 +24,7 @@ public class ChatTextPiece {
     @ApiModelProperty("自增的文本, 用于指示文档顺序." +
                       "但id是负数时, 表示特殊含义(-1: 结束;-2: 重复提问;-1: 服务器异常)")
     private Integer id;
-    @ApiModelProperty("")
+    @ApiModelProperty("文本碎片")
     private String text;
 
     public static ChatTextPiece ofSuccessfullyFinished(String message) {

@@ -18,8 +18,8 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel(description = "注册时需要的参数")
-public class RegisterFormDto implements Serializable {
+@ApiModel(description = "注册/更新用户信息需要的参数")
+public class UpsertUserFormDto implements Serializable {
     @ApiModelProperty(value = "用户的电话号码,会在后端做正则的校验", required = true)
     private String phone;
     @ApiModelProperty(value = "密码", required = true)

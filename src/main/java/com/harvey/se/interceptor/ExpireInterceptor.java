@@ -1,6 +1,7 @@
 package com.harvey.se.interceptor;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.harvey.se.exception.BadRequestException;
 import com.harvey.se.pojo.dto.UserDto;
 import com.harvey.se.properties.ConstantsProperties;
 import com.harvey.se.service.UserService;
@@ -43,9 +44,7 @@ public class ExpireInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler) {
+            HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         // 进入controller之前进行登录校验
 
@@ -94,8 +93,7 @@ public class ExpireInterceptor implements HandlerInterceptor {
 
         // 更新时间
         if (RedisConstants.ENTITY_CACHE_TTL != -1L) {
-            stringRedisTemplate
-                    .expire(tokenKey, RedisConstants.ENTITY_CACHE_TTL, TimeUnit.MINUTES);
+            stringRedisTemplate.expire(tokenKey, RedisConstants.ENTITY_CACHE_TTL, TimeUnit.MINUTES);
         }
 
         String time = (String) userFieldMap.get(REQUEST_TIME_FIELD);
@@ -103,10 +101,10 @@ public class ExpireInterceptor implements HandlerInterceptor {
             log.error("id = " + id + " 访问次数太多了");
             //  经测试, 这个需要频率数在200QPS能触发28次左右(限制是同时7个)
             // 这种肯定是开挂了, 要不要加黑名单到里去?
-            // TODO throw new BadRequestException("request too much");
+            // TODO
+            throw new BadRequestException("request too much");
         } else {
-            stringRedisTemplate.opsForHash()
-                    .increment(tokenKey, REQUEST_TIME_FIELD, -1);
+            stringRedisTemplate.opsForHash().increment(tokenKey, REQUEST_TIME_FIELD, -1);
         }
         userFieldMap.remove(REQUEST_TIME_FIELD);
         if (userFieldMap.isEmpty()) {
@@ -120,9 +118,7 @@ public class ExpireInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler, Exception ex) {
+            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         doAfter(ClientIpUtil.get(request));
     }
 

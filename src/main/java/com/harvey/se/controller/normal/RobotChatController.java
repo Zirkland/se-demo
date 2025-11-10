@@ -9,6 +9,7 @@ import com.harvey.se.properties.ConstantsProperties;
 import com.harvey.se.service.ChatMessageService;
 import com.harvey.se.service.RobotChatService;
 import com.harvey.se.util.ConstantsInitializer;
+import com.harvey.se.util.RedisIdWorker;
 import com.harvey.se.util.ServerConstants;
 import com.harvey.se.util.UserHolder;
 import io.swagger.annotations.Api;
@@ -43,12 +44,16 @@ public class RobotChatController {
     @Resource
     private ConstantsInitializer constantsInitializer;
 
+    @Resource
+    private RedisIdWorker redisIdWorker;
+
     @PostMapping(value = "/chat")
     @ApiOperation(
             "用户问问题, LLM进行回答, 回答使用流式回答. 在回答期间, 用户再问问题, 问题将被忽略. 请客户端阻止用户问问题. 有积分拿, 每日五次, 每次五分 ")
     public Result<Long> streamChat(@RequestBody String message) throws InterruptedException {
         // 生成一个ID, 表示这一次回答
         return new Result<>(robotChatService.chat(UserHolder.getUser(), message, 0/*TODO 更多...*/));
+        // return new Result<>(redisIdWorker.nextId(RedisConstants.Chat.ID_GENERATOR));
     }
 
     @ApiOperation("获取文本片段")

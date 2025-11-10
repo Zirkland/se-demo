@@ -4,7 +4,7 @@ package com.harvey.se.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.harvey.se.pojo.dto.LoginFormDto;
-import com.harvey.se.pojo.dto.RegisterFormDto;
+import com.harvey.se.pojo.dto.UpsertUserFormDto;
 import com.harvey.se.pojo.dto.UserDto;
 import com.harvey.se.pojo.dto.UserInfoDto;
 import com.harvey.se.pojo.entity.User;
@@ -54,10 +54,10 @@ public interface UserService extends IService<User> {
 
     String chooseLoginWay(LoginFormDto loginForm);
 
-    String register(RegisterFormDto registerForm);
+    String register(UpsertUserFormDto registerForm);
 
     @Transactional
-    void updateUser(UserDto userDTO, String token);
+    String updateUser(UpsertUserFormDto userDTO, String token);
 
     UserDto queryUserByIdWithRedisson(Long userId) throws InterruptedException;
 

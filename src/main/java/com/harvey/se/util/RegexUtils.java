@@ -17,7 +17,7 @@ public class RegexUtils {
     }
 
     /**
-     * 是否是可行的密码格式
+     * 是否是可行的密码格式, 4~32位的字母、数字、下划线
      *
      * @param password 要校验的密码
      * @return true:有效，false：无效

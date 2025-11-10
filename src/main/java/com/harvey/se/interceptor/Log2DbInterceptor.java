@@ -51,7 +51,7 @@ public class Log2DbInterceptor implements HandlerInterceptor {
                 UserHolder.existUser() ? UserHolder.currentUserId() : null,
                 ClientIpUtil.get(request),
                 request.getRequestURI(),
-                request.getMethod().toUpperCase(),
+                request.getMethod().toUpperCase().trim(),
                 requestDate,
                 (int) (System.currentTimeMillis() - requestDate.getTime()),
                 status

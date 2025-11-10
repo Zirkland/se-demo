@@ -3,7 +3,7 @@ package com.harvey.se.controller.normal;
 import com.harvey.se.exception.BadRequestException;
 import com.harvey.se.exception.ResourceNotFountException;
 import com.harvey.se.pojo.dto.LoginFormDto;
-import com.harvey.se.pojo.dto.RegisterFormDto;
+import com.harvey.se.pojo.dto.UpsertUserFormDto;
 import com.harvey.se.pojo.dto.UserDto;
 import com.harvey.se.pojo.entity.User;
 import com.harvey.se.pojo.vo.Null;
@@ -77,8 +77,8 @@ public class UserController {
      */
     @PostMapping("/login")
     @ApiOperation("登录")
-    @ApiResponse(code = 200, responseHeaders = @ResponseHeader(name = ServerConstants.AUTHORIZATION_HEADER,
-            description = "JWT token"),
+    @ApiResponse(code = 200,
+            responseHeaders = @ResponseHeader(name = ServerConstants.AUTHORIZATION_HEADER, description = "JWT token"),
             message = "在响应头里有用户校验token, 发送请求时在请求头里带上这个token, 表示这个用户已经登录")
     public Result<Null> login(
             @RequestBody @ApiParam(value = "需要用户登录的Json,密码和验证码二选一", readOnly = true, required = true)
@@ -100,12 +100,12 @@ public class UserController {
      */
     @PostMapping("/register")
     @ApiOperation("注册")
-    @ApiResponse(code = 200, responseHeaders = @ResponseHeader(name = ServerConstants.AUTHORIZATION_HEADER,
-            description = "JWT token"),
+    @ApiResponse(code = 200,
+            responseHeaders = @ResponseHeader(name = ServerConstants.AUTHORIZATION_HEADER, description = "JWT token"),
             message = "在响应头里有用户校验token, 发送请求时在请求头里带上这个token, 表示这个用户已经登录")
     public Result<Null> register(
-            @RequestBody @ApiParam(value = "需要用户注册的Json,使用密码", required = true) RegisterFormDto registerForm,
-            @ApiParam(hidden = true) HttpServletResponse response) {
+            @RequestBody @ApiParam(value = "需要用户注册的Json,使用密码", required = true)
+            UpsertUserFormDto registerForm, @ApiParam(hidden = true) HttpServletResponse response) {
 //        System.err.println("hi");
         //实现注册功能
         User user = userService.selectByPhone(registerForm.getPhone());
@@ -120,6 +120,18 @@ public class UserController {
         return Result.ok();
     }
 
+
+    @ApiOperation(value = "更新本用户信息", notes = "不用传ID")
+    @PutMapping("/update")
+    public Result<Null> update(
+            @RequestBody @ApiParam(value = "为了安全, 这里用户事实上只能更新自己的昵称", required = true)
+            UpsertUserFormDto userDTO,
+            @ApiParam(hidden = true) HttpServletRequest request,
+            @ApiParam(hidden = true) HttpServletResponse response) {
+        String token = userService.updateUser(userDTO, request.getHeader(constantsProperties.getAuthorizationHeader()));
+        response.setHeader(constantsProperties.getAuthorizationHeader(), token);
+        return Result.ok();
+    }
 
     /**
      * 登出功能
@@ -162,13 +174,5 @@ public class UserController {
         return new Result<>(userDTO);
     }
 
-    @ApiOperation(value = "更新本用户信息", notes = "不用传ID")
-    @PutMapping("/update")
-    public Result<Null> update(
-            @RequestBody @ApiParam(value = "为了安全, 这里用户事实上只能更新自己的昵称", required = true)
-            UserDto userDTO, @ApiParam(hidden = true) HttpServletRequest request) {
-        userService.updateUser(userDTO, request.getHeader(constantsProperties.getAuthorizationHeader()));
-        return Result.ok();
-    }
 
 }

@@ -12,7 +12,7 @@ import com.harvey.se.dao.UserMapper;
 import com.harvey.se.exception.BadRequestException;
 import com.harvey.se.exception.UnauthorizedException;
 import com.harvey.se.pojo.dto.LoginFormDto;
-import com.harvey.se.pojo.dto.RegisterFormDto;
+import com.harvey.se.pojo.dto.UpsertUserFormDto;
 import com.harvey.se.pojo.dto.UserDto;
 import com.harvey.se.pojo.dto.UserInfoDto;
 import com.harvey.se.pojo.entity.User;
@@ -183,9 +183,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional
-    public String register(RegisterFormDto registerForm) {
+    public String register(UpsertUserFormDto registerForm) {
         User registerUser = new User();
         String phone = registerForm.getPhone();
+        if (!RegexUtils.isPhoneEffective(phone)) {
+            throw new BadRequestException("不正确额电话号码格式");
+        }
         registerUser.setPhone(phone);
         registerUser.setPassword(passwordEncoder.encode(registerForm.getPassword()));
         registerUser.setNickname(registerForm.getNickname());
@@ -211,12 +214,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional
-    public void updateUser(UserDto userDTO, String token) {
+    public String updateUser(UpsertUserFormDto userDto, String token) {
         // 更新实体数据
         User user = this.getById(UserHolder.currentUserId());
-        String nickname = userDTO.getNickname();
+        String nickname = userDto.getNickname();
         if (!StrUtil.isEmpty(nickname)) {
             user.setNickname(nickname);
+        }
+        if (RegexUtils.isPasswordEffective(userDto.getPassword())) {
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        } else {
+            throw new BadRequestException("密码个数错误, 应当是4~32位的字母、数字、下划线");
+        }
+        if (RegexUtils.isPhoneEffective(user.getPhone())) {
+            user.setPhone(userDto.getPhone());
+        } else {
+            throw new BadRequestException("电话格式错误");
         }
         // ignore upsert of role
         // ignore upsert of points
@@ -234,6 +247,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         UserHolder.saveUser(new UserDto(user));
         saveUser2Redis(tokenKey, user2Map(UserHolder.getUser()), Long.parseLong(lastTime));
+        return jwtTool.createToken(user.getId(), jwtProperties.getTokenTTL());
     }
 
     private void saveToRedis(UserDto userDTO, String token) {
@@ -401,7 +415,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BadRequestException("余额不足");
         }
         boolean updated = new LambdaUpdateChainWrapper<>(baseMapper).set(User::getPoints, nextPoint)
-                .eq(User::getId, userId).update();
+                .eq(User::getId, userId)
+                .update();
         // 2. 删除缓存
         if (!updated) {
             throw new IllegalStateException(userId + "增加 point " + point + "失败!");
